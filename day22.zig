@@ -2,19 +2,12 @@ const std = @import("std");
 const print = std.debug.warn;
 const fmt = std.fmt;
 const tokenize = std.mem.tokenize;
-const sort = std.sort;
 
 const input = @embedFile("input22.txt");
 
 const POISON_DAMAGE = 3;
 const SHIELD_DR = 7;
 const RECHARGE_MP = 101;
-
-const Actor = struct {
-    hitpoints: i32 = 0,
-    damage: i32 = 0,
-    armour: i32 = 0,
-};
 
 const Game_State = struct {
     // Defaults are zero so keys can be left out in spellbook below
@@ -34,40 +27,47 @@ const Game_State = struct {
     // 011: shield
     // 100: poison
     // 101: recharge
+    // A non-insane way to do this would be to use an array, e.g. [20]u3
 };
 
 // Spellbook
 // (spells add their state to the current game state)
-const sp_magic_missile = Game_State{
-    .spent_mp = 53,
-    .player_mp = -53,
-    .boss_hp = -4,
+const spellbook = [_]Game_State{
+    // magic missile
+    .{
+        .spent_mp = 53,
+        .player_mp = -53,
+        .boss_hp = -4,
+    },
+    // drain
+    .{
+        .spent_mp = 73,
+        .player_mp = -73,
+        .boss_hp = -2,
+        .player_hp = 2,
+    },
+    // shield
+    .{
+        // increases DR by 7
+        .spent_mp = 113,
+        .player_mp = -113,
+        .shield_timer = 6,
+    },
+    // poison
+    .{
+        // deals 3 damage per turn
+        .spent_mp = 173,
+        .player_mp = -173,
+        .poison_timer = 6,
+    },
+    // recharge
+    .{
+        // replenishes 101 MP per turn
+        .spent_mp = 229,
+        .player_mp = -229,
+        .recharge_timer = 5,
+    },
 };
-const sp_drain = Game_State{
-    .spent_mp = 73,
-    .player_mp = -73,
-    .boss_hp = -2,
-    .player_hp = 2,
-};
-const sp_shield = Game_State{
-    // increases DR by 7
-    .spent_mp = 113,
-    .player_mp = -113,
-    .shield_timer = 6,
-};
-const sp_poison = Game_State{
-    // deals 3 damage per turn
-    .spent_mp = 173,
-    .player_mp = -173,
-    .poison_timer = 6,
-};
-const sp_recharge = Game_State{
-    // replenishes 101 MP per turn
-    .spent_mp = 229,
-    .player_mp = -229,
-    .recharge_timer = 5,
-};
-const spellbook = [_]Game_State{ sp_magic_missile, sp_drain, sp_shield, sp_poison, sp_recharge };
 
 fn extract_number(text: []const u8) i8 {
     for (text) |ch, i| {
@@ -85,6 +85,7 @@ fn write_history(history: u64) void {
     while (tmp > 0) {
         switch (tmp % 0b1000) {
             0b000 => print("[nothing]<-", .{}),
+            // cases must be in the order spells appear in spellbook
             0b001 => print("[magic missile]<-", .{}),
             0b010 => print("[drain]<-", .{}),
             0b011 => print("[shield]<-", .{}),

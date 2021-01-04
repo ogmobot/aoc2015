@@ -18,7 +18,7 @@ fn make_primes() [num_primes]u64 {
 
 fn next_prime(n: u64) u64 {
     // finds next prime number above n,
-    // by trial division (slow but might work)
+    // by trial division (slow but works fast enough)
     if (n == 2) return 3;
     if (n == 3) return 5;
     var test_number = n + 2;

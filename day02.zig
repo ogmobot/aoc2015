@@ -5,7 +5,7 @@ const fmt = std.fmt;
 
 const input = @embedFile("input02.txt");
 
-fn min(arr: []u32) u32 {
+fn min(arr: []const u32) u32 {
     var result: u32 = std.math.maxInt(u32);
     for (arr) |val| {
         if (val < result) {
@@ -29,21 +29,21 @@ fn get_dimensions(line: []const u8) [3]u32 {
 
 fn get_wrapping_amount(dims: [3]u32) u32 {
     // line is e.g. "3x11x24"
-    var surfaces = [_]u32{
+    const surfaces = [_]u32{
         dims[0] * dims[1],
         dims[1] * dims[2],
         dims[2] * dims[0],
     };
-    return 2 * (surfaces[0] + surfaces[1] + surfaces[2]) + min(&surfaces);
+    return 2 * (surfaces[0] + surfaces[1] + surfaces[2]) + min(surfaces[0..]);
 }
 
 fn get_ribbon_length(dims: [3]u32) u32 {
-    var half_perimeters = [_]u32{
+    const half_perimeters = [_]u32{
         dims[0] + dims[1],
         dims[1] + dims[2],
         dims[2] + dims[0],
     };
-    return 2 * min(&half_perimeters) + (dims[0] * dims[1] * dims[2]);
+    return 2 * min(half_perimeters[0..]) + (dims[0] * dims[1] * dims[2]);
 }
 
 pub fn main() void {

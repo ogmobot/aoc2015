@@ -108,10 +108,9 @@ pub fn main() !void {
             best_reindeer = r;
         }
     }
-    if (best_reindeer) |br| {
-        //print("{}\n", .{br});
-        print("{}\n", .{br.distance});
-    }
+    //print("{}\n", .{best_reindeer});
+    print("{}\n", .{best_reindeer.?.distance});
+
     // part 2
     for (reindeer_list.items) |r, i| {
         reindeer_list.items[i].reset();
@@ -140,8 +139,6 @@ pub fn main() !void {
             best_reindeer = r;
         }
     }
-    if (best_reindeer) |br| {
-        //print("{}\n", .{br});
-        print("{}\n", .{br.score});
-    }
+    //print("{}\n", .{best_reindeer});
+    print("{}\n", .{best_reindeer.?.score});
 }

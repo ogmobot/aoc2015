@@ -80,15 +80,12 @@ pub fn main() void {
 
     // part 1: boolean lights
     var lights_bool: [light_size][light_size]bool = undefined;
+    // part 2: integer lights
+    var lights_int: [light_size][light_size]u16 = undefined;
+
     for (lights_bool) |row, r| {
         for (row) |light, c| {
             lights_bool[r][c] = false;
-        }
-    }
-    // part 2: integer lights
-    var lights_int: [light_size][light_size]u16 = undefined;
-    for (lights_int) |row, r| {
-        for (row) |light, c| {
             lights_int[r][c] = 0;
         }
     }

@@ -26,17 +26,11 @@ fn next_number(buffer: *std.ArrayList(u8), current: *std.ArrayList(u8)) !usize {
             count += 1;
         }
     }
-    //print("end-of-next-numer capacity={}\n", .{buffer.capacity});
+    //print("end-of-next-number capacity={}\n", .{buffer.capacity});
+    // Add terminator so next iteration knows when to stop.
+    // (Can't use buffer.items.len because of expandToCapacity above)
     buffer.items[buffer_index] = 0;
     return buffer_index;
-}
-
-fn lenZ(c_string: []const u8) usize {
-    var index: usize = 0;
-    while (c_string[index] != 0) {
-        index += 1;
-    }
-    return index;
 }
 
 fn print_arr(arr: []const u8) void {
@@ -57,7 +51,7 @@ pub fn main() void {
 
     _ = current.ensureCapacity(input.len) catch unreachable;
     _ = current.expandToCapacity();
-    mem.copy(u8, current.items, input); // copies null terminator
+    mem.copy(u8, current.items, input); // copies null terminator from input
 
     // part 1
     var i: u8 = 0;

@@ -19,22 +19,23 @@ const Recipe = struct {
     // r.ingredients[0] => { .name="Sugar", ... , .calories=1 }
     // r.qty[0] => 25
     ingredients: []Ingredient,
-    qty: []u32,
+    // qty[i] >= 0, but using i32 here avoids intCasting later
+    qty: []i32,
 };
 
 const Compositions = struct {
     allocator: *mem.Allocator,
-    values: []u32,
-    a: u32, //size of integer to compose, e.g. 100
+    values: []i32, // avoids intCasting later
+    a: i32, //size of integer to compose, e.g. 100
     k: usize, //number of parts, e.g. 4
     const Self = @This();
 
-    fn init(allocator: *mem.Allocator, a: u32, k: u32) Self {
+    fn init(allocator: *mem.Allocator, a: i32, k: usize) Self {
         var result = Self{
             .allocator = allocator,
             .a = a,
             .k = k,
-            .values = allocator.alloc(u32, k) catch &[_]u32{},
+            .values = allocator.alloc(i32, k) catch &[_]i32{},
         };
         result.reset();
         return result;
@@ -49,7 +50,7 @@ const Compositions = struct {
     // (99 0 1 0) (98 1 1 0) .. (0 99 1 0)
     // (98 0 2 0) (97 1 2 0) .. (0 98 2 0) .. (0 0 100 0)
     // .. (0 0 0 100)
-    fn next(self: *Compositions) ?[]u32 {
+    fn next(self: *Compositions) ?[]i32 {
         var just_reset: bool = true;
         for (self.values) |v| {
             if (v != 0) just_reset = false;
@@ -97,10 +98,10 @@ fn score(recipe: Recipe) i32 {
     var flavour: i32 = 0;
     var texture: i32 = 0;
     for (recipe.ingredients) |ingredient, i| {
-        capacity += ingredient.capacity * @intCast(i32, recipe.qty[i]);
-        durability += ingredient.durability * @intCast(i32, recipe.qty[i]);
-        flavour += ingredient.flavour * @intCast(i32, recipe.qty[i]);
-        texture += ingredient.texture * @intCast(i32, recipe.qty[i]);
+        capacity += ingredient.capacity * recipe.qty[i];
+        durability += ingredient.durability * recipe.qty[i];
+        flavour += ingredient.flavour * recipe.qty[i];
+        texture += ingredient.texture * recipe.qty[i];
     }
     if (capacity < 0 or durability < 0 or flavour < 0 or texture < 0) return 0;
     return capacity * durability * flavour * texture;
@@ -109,7 +110,7 @@ fn score(recipe: Recipe) i32 {
 fn calorie_count(recipe: Recipe) i32 {
     var calories: i32 = 0;
     for (recipe.ingredients) |ingredient, i| {
-        calories += ingredient.calories * @intCast(i32, recipe.qty[i]);
+        calories += ingredient.calories * recipe.qty[i];
     }
     return calories;
 }
@@ -162,13 +163,13 @@ pub fn main() !void {
         try ingredients.append(line_to_ingredient(line));
     }
 
-    var best_qtys = [_]u32{0} ** 4;
+    var best_qtys = [_]i32{0} ** 4;
     var best_recipe = Recipe{
         .ingredients = ingredients.items,
         .qty = &best_qtys,
     };
 
-    var best_500_qtys = [_]u32{0} ** 4;
+    var best_500_qtys = [_]i32{0} ** 4;
     var best_500_recipe = Recipe{
         .ingredients = ingredients.items,
         .qty = &best_500_qtys,

@@ -19,9 +19,9 @@ fn make_primes() [num_primes]u64 {
 fn next_prime(n: u64) u64 {
     // finds next prime number above n,
     // by trial division (slow but works fast enough)
-    if (n == 2) return 3;
-    if (n == 3) return 5;
-    var test_number = n + 2;
+    if (n <= 2) return 3;
+    if (n <= 4) return 5;
+    var test_number = if (n % 2 == 1) n + 2 else n + 1;
     while (true) {
         // skip all the even numbers, so don't need to check div by 2
         var divisor: u64 = 3;
